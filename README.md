@@ -13,7 +13,7 @@ del cuarto de círculo x² + y² ≤ 1. La proporción tiende a π/4, así que �
 - [`montecarlo.c`](montecarlo.c): el programa paralelo final (también en `Parte_II/codigo/`).
 - [`Documento_Final.pdf`](Documento_Final.pdf): las cuatro partes del examen, con figuras, capturas y la bitácora de IA.
 - [`Parte_IV/Parte_IV_Informe.pdf`](Parte_IV/Parte_IV_Informe.pdf): el informe de la Parte IV con la bitácora de IA como anexo.
-- [`PRESENTACION - Tesis en 3 Minutos.pdf`](PRESENTACION%20-%20Tesis%20en%203%20Minutos.pdf): la diapositiva de la presentación, con la metodología Tesis en 3 Minutos.
+- [`PRESENTACION - Tipo tesis como el profesor lo dijo y 3 minutos.pdf`](PRESENTACION%20-%20Tipo%20tesis%20como%20el%20profesor%20lo%20dijo%20y%203%20minutos.pdf): la diapositiva de la presentación, con la metodología Tesis en 3 Minutos.
 
 ## Resultados principales
 
