@@ -1,9 +1,9 @@
 /* convergencia.c - I.1: muestra como baja el error al usar mas puntos.
    Compara mi corrida y el promedio de 30 corridas con la formula.
    Uso: ./convergencia */
-#include <stdio.h>    /* printf */
-#include <stdlib.h>   /* rand_r, rand, atol */
-#include <math.h>     /* fabs, M_PI */
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #define SEMILLA 2224510u   /* semilla = mi codigo */
 #define CORRIDAS 30   /* corridas para el error medio */
@@ -20,13 +20,13 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {
     return A * s + C;
 }
 
-static double estimar(long n, unsigned int semilla) {   /* calcula pi con n puntos */
+static double estimar(long n, unsigned int semilla) {
     unsigned int estado = semilla;
     long dentro = 0;
     for (long i = 0; i < n; i++) {
         double x = rand_r(&estado) / (double)RAND_MAX;
         double y = rand_r(&estado) / (double)RAND_MAX;
-        if (x * x + y * y <= 1.0)   /* dentro del circulo */
+        if (x * x + y * y <= 1.0)
             dentro++;
     }
     return 4.0 * dentro / (double)n;
@@ -47,7 +47,7 @@ int main(void) {
                 double e = estimar(n, s) - M_PI;
                 suma2 += e * e;
             }
-            printf("%14.2e  ", sqrt(suma2 / CORRIDAS));   /* error medio */
+            printf("%14.2e  ", sqrt(suma2 / CORRIDAS));
         } else {
             printf("%14s  ", "-");
         }

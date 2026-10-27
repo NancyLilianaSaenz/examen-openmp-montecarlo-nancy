@@ -1,15 +1,15 @@
 /* semillas_hilos.c - Prueba II.2: muestra en que punto de la lista de
    numeros empieza cada hilo y lo comprueba con rand_r.
    Uso: ./semillas_hilos <puntos> <hilos> */
-#include <stdio.h>    /* printf */
-#include <stdlib.h>   /* rand_r, rand, atol */
-#include <omp.h>      /* OpenMP */
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
 
 #define SEMILLA_BASE 2224510u   /* semilla = mi codigo */
-#define BLOQUE 100000L          /* puntos por paquete */
+#define BLOQUE 100000L
 #define LCG_A 1103515245u
 #define LCG_C 12345u
-#define PASOS_POR_MUESTRA 6ULL  /* pasos por punto */
+#define PASOS_POR_MUESTRA 6ULL
 
 static unsigned int saltar(unsigned int s, unsigned long long k) {   /* igual que en montecarlo.c */
     unsigned int a = LCG_A, c = LCG_C, A = 1u, C = 0u;
@@ -23,7 +23,7 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {   /* igual qu
 }
 
 int main(int argc, char *argv[]) {
-    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 por defecto) */
+    long N = (argc > 1) ? atol(argv[1]) : 100000000L;
     int p = (argc > 2) ? atoi(argv[2]) : 4;
     omp_set_num_threads(p);
     long nbloques = (N + BLOQUE - 1) / BLOQUE;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     #pragma omp parallel for schedule(static)   /* mismo reparto que el final */
     for (long b = 0; b < nbloques; b++) {
-        int k = omp_get_thread_num();   /* hilo actual */
+        int k = omp_get_thread_num();
         if (primero[k] < 0) primero[k] = b;
         ultimo[k] = b;
     }

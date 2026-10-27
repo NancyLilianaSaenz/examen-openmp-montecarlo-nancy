@@ -1,10 +1,10 @@
 /* sobrecosto.c - Mide cuanto cuesta crear los hilos y hacer la reduccion.
    Uso: ./sobrecosto <hilos> */
-#include <stdio.h>    /* printf */
-#include <stdlib.h>   /* rand_r, rand, atol */
-#include <omp.h>      /* OpenMP */
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
 
-#define REPETICIONES 20000   /* veces que se repite */
+#define REPETICIONES 20000
 
 int main(int argc, char *argv[]) {
     int p = (argc > 1) ? atoi(argv[1]) : 4;
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     volatile long basura = 0;   /* evita que se borren las regiones */
 
     /* La primera region crea los hilos */
-    double t0 = omp_get_wtime();   /* reloj al empezar */
+    double t0 = omp_get_wtime();
     #pragma omp parallel
     { if (omp_get_thread_num() < 0) basura++; }
     double creacion = omp_get_wtime() - t0;   /* costo de crear los hilos */

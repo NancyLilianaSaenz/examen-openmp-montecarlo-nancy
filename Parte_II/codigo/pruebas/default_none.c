@@ -2,13 +2,13 @@
    Es la misma region del programa final, pero con default(none):
    el compilador da un error por cada variable compartida.
    No compila a proposito. */
-#include <stdio.h>    /* printf */
-#include <stdlib.h>   /* rand_r, rand, atol */
-#include <math.h>     /* fabs, M_PI */
-#include <omp.h>      /* OpenMP */
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <omp.h>
 
 #define SEMILLA_BASE 2224510u /* semilla = mi codigo */
-#define BLOQUE 100000L         /* puntos por paquete */
+#define BLOQUE 100000L
 
 #ifndef PLAN
 #define PLAN static            /* reparto en partes iguales */
@@ -23,8 +23,8 @@
 
 /* Salta k pasos en la lista de numeros de una vez */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
-    unsigned int a = LCG_A, c = LCG_C;  /* salto de 1, 2, 4, 8... pasos */
-    unsigned int A = 1u, C = 0u;        /* salto acumulado */
+    unsigned int a = LCG_A, c = LCG_C;
+    unsigned int A = 1u, C = 0u;
     while (k) {
         if (k & 1ULL) {
             A = a * A;
@@ -38,8 +38,8 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {
 }
 
 int main(int argc, char *argv[]) {
-    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 por defecto) */
-    if (argc > 2) omp_set_num_threads(atoi(argv[2]));   /* hilos */
+    long N = (argc > 1) ? atol(argv[1]) : 100000000L;
+    if (argc > 2) omp_set_num_threads(atoi(argv[2]));
     unsigned int semilla = (argc > 3) ? (unsigned int)strtoul(argv[3], NULL, 10)
                                       : SEMILLA_BASE;
 
@@ -57,9 +57,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "aviso: N supera el periodo del generador\n");
 
     long nbloques = (N + BLOQUE - 1) / BLOQUE;
-    long dentro = 0;   /* aciertos */
+    long dentro = 0;
 
-    double t0 = omp_get_wtime();   /* reloj al empezar */
+    double t0 = omp_get_wtime();
     #pragma omp parallel for default(none) reduction(+:dentro) schedule(PLAN)   /* obliga a declarar todo */
     for (long b = 0; b < nbloques; b++) {
         unsigned int estado =
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
                 dentro++;
         }
     }
-    double t = omp_get_wtime() - t0;   /* tiempo */
+    double t = omp_get_wtime() - t0;
 
     double pi = 4.0 * dentro / (double)N;   /* pi = 4 x aciertos / puntos */
     printf("default_none p=%d N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",
