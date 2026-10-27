@@ -17,7 +17,7 @@ del cuarto de círculo x² + y² ≤ 1. La proporción tiende a π/4, así que �
 ## Resultados principales
 
 Con N = 10⁸ y la semilla 2224510 el programa da **π ≈ 3,141668**, con un error de 7,56 × 10⁻⁵
-(menor que el error típico esperado, 1,64 × 10⁻⁴). El conteo de aciertos es **78 541 707** con
+(menor que el error típico esperado, 1,64 × 10⁻⁴). El conteo de aciertos es **78.541.707** con
 1, 2, 4 y 8 hilos, igual al del programa secuencial: el resultado no depende del número de hilos.
 
 Mediana de 7 ejecuciones en un AMD Ryzen 5 3450U (4 núcleos, 8 hilos), Ubuntu en WSL, gcc 15.2.0:
@@ -33,7 +33,7 @@ Mediana de 7 ejecuciones en un AMD Ryzen 5 3450U (4 núcleos, 8 hilos), Ubuntu e
 
 ## Cómo se paralelizó
 
-El ciclo del programa secuencial se conserva. Las N muestras se dividen en 1000 bloques de 100 000
+El ciclo del programa secuencial se conserva. Las N muestras se dividen en 1.000 bloques de 100.000
 y OpenMP reparte los bloques entre los hilos:
 
 ```c
