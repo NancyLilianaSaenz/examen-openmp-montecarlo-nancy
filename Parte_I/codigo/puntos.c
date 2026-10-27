@@ -1,10 +1,9 @@
-/* puntos.c -- genera los primeros puntos (x, y) del metodo de acierto y fallo
-   con rand_r y la semilla asignada, para dibujarlos (figura de la parte I).
+/* puntos.c - Genera los primeros puntos (dardos) para dibujarlos.
    Uso: ./puntos <cantidad> > puntos.txt */
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SEMILLA 2224510u   /* codigo de estudiante: Nancy Liliana Saenz Moreno */
+#define SEMILLA 2224510u   /* mi codigo de estudiante */
 
 int main(int argc, char *argv[]) {
     long n = (argc > 1) ? atol(argv[1]) : 2000;

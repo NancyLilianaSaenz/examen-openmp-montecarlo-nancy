@@ -1,7 +1,6 @@
-/* estado_compartido.c -- PRUEBA para II.3 (incorrecta a proposito).
-   Se agrega reduction(+:dentro), pero el estado 'estado' del generador
-   sigue siendo compartido por todos los hilos (carrera sobre el estado).
-   Uso: ./v2 <N> <hilos> */
+/* estado_compartido.c - Prueba II.3 (con error a proposito):
+   todos los hilos usan el mismo generador y se pisan.
+   Uso: ./estado_compartido <puntos> <hilos> */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

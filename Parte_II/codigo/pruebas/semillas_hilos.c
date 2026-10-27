@@ -1,9 +1,6 @@
-/* semillas_hilos.c -- PRUEBA para II.2.
-   Usa el mismo reparto que la version final (parallel for schedule(static)
-   sobre bloques de BLOQUE muestras) y muestra, para cada hilo, en que
-   muestra empieza y con que estado del generador. Luego comprueba ese
-   estado avanzando rand_r de forma secuencial desde la semilla base.
-   Uso: ./semillas_hilos <N> <hilos> */
+/* semillas_hilos.c - Prueba II.2: muestra en que punto de la lista de
+   numeros empieza cada hilo y lo comprueba con rand_r.
+   Uso: ./semillas_hilos <puntos> <hilos> */
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -42,7 +39,7 @@ int main(int argc, char *argv[]) {
 
     printf("N=%ld  p=%d  N/p=%ld  semilla base=%u\n", N, p, N / p, SEMILLA_BASE);
     printf("hilo  bloques      muestras que genera        estado inicial  rand_r secuencial  ok\n");
-    unsigned int s = SEMILLA_BASE;   /* avance secuencial real con rand_r */
+    unsigned int s = SEMILLA_BASE;   /* avanzar uno por uno, para comparar */
     long hecho = 0;
     for (int k = 0; k < p; k++) {
         long ini = primero[k] * BLOQUE;

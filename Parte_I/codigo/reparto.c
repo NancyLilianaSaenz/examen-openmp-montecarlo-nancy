@@ -1,16 +1,16 @@
-/* reparto.c -- I.3: repartir las N muestras en p tramos y sumar los aciertos
-   parciales da exactamente el mismo conteo que hacerlas todas de corrido.
-   Uso: ./reparto <N> <p> */
+/* reparto.c - I.3: parte los puntos en p tramos y comprueba que la suma
+   de los tramos da lo mismo que contar todo de corrido.
+   Uso: ./reparto <puntos> <tramos> */
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SEMILLA 2224510u   /* codigo de estudiante */
+#define SEMILLA 2224510u   /* mi codigo de estudiante */
 
 int main(int argc, char *argv[]) {
     long N = (argc > 1) ? atol(argv[1]) : 100000000L;
     int p = (argc > 2) ? atoi(argv[2]) : 4;
 
-    /* Todas las muestras de corrido (como el programa secuencial). */
+    /* 1) Contar todo de corrido, como el programa secuencial */
     unsigned int estado = SEMILLA;
     long total = 0;
     for (long i = 0; i < N; i++) {
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
         if (x * x + y * y <= 1.0) total++;
     }
 
-    /* Las mismas muestras partidas en p tramos consecutivos de N/p. */
+    /* 2) Contar los mismos puntos partidos en p tramos */
     estado = SEMILLA;
     long suma = 0;
     for (int k = 0; k < p; k++) {

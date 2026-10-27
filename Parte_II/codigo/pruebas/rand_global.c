@@ -1,8 +1,6 @@
-/* rand_global.c -- PRUEBA para II.3 (incorrecta a proposito).
-   Todos los hilos llaman a rand(), que guarda su estado en una variable
-   global de la biblioteca. Se usa reduction, asi que el unico problema
-   es el generador compartido.
-   Uso: ./rand_global <N> <hilos> */
+/* rand_global.c - Prueba II.3 (con error a proposito):
+   todos los hilos usan rand(), que tiene un solo estado para todos.
+   Uso: ./rand_global <puntos> <hilos> */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

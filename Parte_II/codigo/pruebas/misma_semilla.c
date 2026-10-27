@@ -1,8 +1,7 @@
-/* misma_semilla.c -- PRUEBA para II.3 (incorrecta a proposito).
-   Cada hilo recibe una copia privada del estado (firstprivate), pero todas
-   las copias arrancan con la MISMA semilla: los p hilos generan la misma
-   secuencia de puntos (correlacion total entre secuencias).
-   Uso: ./v3 <N> <hilos> */
+/* misma_semilla.c - Prueba II.3 (con error a proposito):
+   cada hilo tiene su generador, pero todos con la misma semilla,
+   asi que todos repiten los mismos puntos.
+   Uso: ./misma_semilla <puntos> <hilos> */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

@@ -1,37 +1,29 @@
-/* montecarlo.c -- version paralela con OpenMP (version final).
-   Uso: ./montecarlo <numero de muestras> [hilos] [semilla]
-        (el numero de hilos tambien puede fijarse con OMP_NUM_THREADS)
-   Compilar: gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm
-
-   Idea: la secuencia de rand_r con la semilla base se parte en bloques
-   consecutivos de BLOQUE muestras. El estado inicial de cada bloque se
-   calcula "saltando" hacia adelante en el generador, asi que cada bloque
-   consume siempre los mismos numeros, sin importar que hilo lo ejecute.
-   Resultado: flujos disjuntos (sin solapamiento) y la misma estimacion
-   para cualquier p, identica ademas a la de la version secuencial. */
+/* montecarlo.c - Calcula pi con Monte Carlo usando varios hilos (OpenMP).
+   Uso: ./montecarlo <puntos> [hilos] [semilla]
+   Compilar: gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
 
-#define SEMILLA_BASE 2224510u /* semilla asignada: codigo 2224510 */
-#define BLOQUE 100000L         /* muestras por bloque */
+#define SEMILLA_BASE 2224510u /* mi codigo de estudiante */
+#define BLOQUE 100000L         /* puntos por paquete */
 
 #ifndef PLAN
-#define PLAN static            /* -DPLAN=dynamic para otra planificacion */
+#define PLAN static            /* reparto de paquetes (o dynamic) */
 #endif
 
-/* rand_r de glibc avanza su estado con 3 pasos del LCG
-   s <- 1103515245*s + 12345 (mod 2^32) en cada llamada,
-   y cada muestra (x, y) hace 2 llamadas: 6 pasos por muestra. */
+/* rand_r usa la formula s = 1103515245*s + 12345.
+   Cada llamada da 3 pasos de la formula y cada punto
+   (x, y) hace 2 llamadas: 6 pasos por punto. */
 #define LCG_A 1103515245u
 #define LCG_C 12345u
 #define PASOS_POR_MUESTRA 6ULL
 
-/* Avanza el estado s en k pasos del LCG con O(log k) operaciones. */
+/* Da el estado del generador tras avanzar k pasos, sin hacerlos uno por uno. */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
-    unsigned int a = LCG_A, c = LCG_C;  /* transformacion de 2^j pasos */
-    unsigned int A = 1u, C = 0u;        /* transformacion acumulada */
+    unsigned int a = LCG_A, c = LCG_C;  /* formula para 1, 2, 4, 8... pasos */
+    unsigned int A = 1u, C = 0u;        /* formula acumulada */
     while (k) {
         if (k & 1ULL) {
             A = a * A;
@@ -45,12 +37,13 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {
 }
 
 int main(int argc, char *argv[]) {
+    /* Datos: puntos, hilos y semilla */
     long N = (argc > 1) ? atol(argv[1]) : 100000000L;
     if (argc > 2) omp_set_num_threads(atoi(argv[2]));
     unsigned int semilla = (argc > 3) ? (unsigned int)strtoul(argv[3], NULL, 10)
                                       : SEMILLA_BASE;
 
-    /* El salto debe coincidir con lo que hace rand_r en esta libc. */
+    /* Revision: saltar debe dar lo mismo que rand_r */
     unsigned int prueba = semilla;
     rand_r(&prueba);
     rand_r(&prueba);
@@ -58,24 +51,27 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "error: rand_r de esta libc no usa el LCG esperado\n");
         return 1;
     }
-    /* Periodo del estado: 2^32. Con mas de 2^32/6 muestras la secuencia
-       se repetiria y los bloques dejarian de ser disjuntos. */
+    /* Aviso: con demasiados puntos la lista de numeros se
+       repetiria y los paquetes usarian numeros iguales. */
     if ((unsigned long long)N * PASOS_POR_MUESTRA > 4294967296ULL)
         fprintf(stderr, "aviso: N supera el periodo del generador\n");
 
-    long nbloques = (N + BLOQUE - 1) / BLOQUE;
-    long dentro = 0;
+    long nbloques = (N + BLOQUE - 1) / BLOQUE;   /* cantidad de paquetes */
+    long dentro = 0;                             /* aciertos */
 
     double t0 = omp_get_wtime();
+    /* Los hilos se reparten los paquetes. Cada uno cuenta en su propia
+       copia de dentro y al final OpenMP las suma (reduction). */
     #pragma omp parallel for reduction(+:dentro) schedule(PLAN)
     for (long b = 0; b < nbloques; b++) {
+        /* El paquete b empieza en su lugar de la lista de numeros */
         unsigned int estado =
             saltar(semilla, (unsigned long long)b * BLOQUE * PASOS_POR_MUESTRA);
-        long fin = (b + 1) * BLOQUE < N ? (b + 1) * BLOQUE : N;
+        long fin = (b + 1) * BLOQUE < N ? (b + 1) * BLOQUE : N;   /* ultimo punto del paquete */
         for (long i = b * BLOQUE; i < fin; i++) {
             double x = rand_r(&estado) / (double)RAND_MAX;
             double y = rand_r(&estado) / (double)RAND_MAX;
-            if (x * x + y * y <= 1.0)
+            if (x * x + y * y <= 1.0)   /* cayo dentro del circulo */
                 dentro++;
         }
     }

@@ -1,30 +1,30 @@
-/* default_none.c -- PRUEBA para II.4.
-   Misma region paralela que la version final, pero con default(none):
-   el compilador se niega a compilar y nombra cada variable que, por
-   defecto, seria COMPARTIDA (las que no nombra son privadas). */
+/* default_none.c - Prueba II.4.
+   Es la misma region del programa final, pero con default(none):
+   el compilador da un error por cada variable compartida.
+   No compila a proposito. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
 
-#define SEMILLA_BASE 2224510u /* semilla asignada: codigo 2224510 */
-#define BLOQUE 100000L         /* muestras por bloque */
+#define SEMILLA_BASE 2224510u /* mi codigo de estudiante */
+#define BLOQUE 100000L         /* puntos por paquete */
 
 #ifndef PLAN
-#define PLAN static            /* -DPLAN=dynamic para comparar (II.5) */
+#define PLAN static            /* reparto de paquetes (o dynamic) */
 #endif
 
-/* rand_r de glibc avanza su estado con 3 pasos del LCG
-   s <- 1103515245*s + 12345 (mod 2^32) en cada llamada,
-   y cada muestra (x, y) hace 2 llamadas: 6 pasos por muestra. */
+/* rand_r usa la formula s = 1103515245*s + 12345.
+   Cada llamada da 3 pasos de la formula y cada punto
+   (x, y) hace 2 llamadas: 6 pasos por punto. */
 #define LCG_A 1103515245u
 #define LCG_C 12345u
 #define PASOS_POR_MUESTRA 6ULL
 
-/* Avanza el estado s en k pasos del LCG con O(log k) operaciones. */
+/* Da el estado del generador tras avanzar k pasos, sin hacerlos uno por uno. */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
-    unsigned int a = LCG_A, c = LCG_C;  /* transformacion de 2^j pasos */
-    unsigned int A = 1u, C = 0u;        /* transformacion acumulada */
+    unsigned int a = LCG_A, c = LCG_C;  /* formula para 1, 2, 4, 8... pasos */
+    unsigned int A = 1u, C = 0u;        /* formula acumulada */
     while (k) {
         if (k & 1ULL) {
             A = a * A;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     unsigned int semilla = (argc > 3) ? (unsigned int)strtoul(argv[3], NULL, 10)
                                       : SEMILLA_BASE;
 
-    /* El salto debe coincidir con lo que hace rand_r en esta libc. */
+    /* Revision: saltar debe dar lo mismo que rand_r */
     unsigned int prueba = semilla;
     rand_r(&prueba);
     rand_r(&prueba);
@@ -51,8 +51,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "error: rand_r de esta libc no usa el LCG esperado\n");
         return 1;
     }
-    /* Periodo del estado: 2^32. Con mas de 2^32/6 muestras la secuencia
-       se repetiria y los bloques dejarian de ser disjuntos. */
+    /* Aviso: con demasiados puntos la lista de numeros se
+       repetiria y los paquetes usarian numeros iguales. */
     if ((unsigned long long)N * PASOS_POR_MUESTRA > 4294967296ULL)
         fprintf(stderr, "aviso: N supera el periodo del generador\n");
 

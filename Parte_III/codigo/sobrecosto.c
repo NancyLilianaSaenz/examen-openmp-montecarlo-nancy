@@ -1,6 +1,4 @@
-/* sobrecosto.c -- mide cuanto cuesta crear los hilos, abrir y cerrar una
-   region paralela y hacer una reduccion, para compararlo con el tiempo total
-   del calculo de pi.
+/* sobrecosto.c - Mide cuanto cuesta crear los hilos y hacer la reduccion.
    Uso: ./sobrecosto <hilos> */
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,13 +11,13 @@ int main(int argc, char *argv[]) {
     omp_set_num_threads(p);
     volatile long basura = 0;
 
-    /* La primera region crea los hilos. */
+    /* La primera region crea los hilos */
     double t0 = omp_get_wtime();
     #pragma omp parallel
     { if (omp_get_thread_num() < 0) basura++; }
     double creacion = omp_get_wtime() - t0;
 
-    /* Las siguientes reutilizan los hilos: solo despertarlos y esperarlos. */
+    /* Las siguientes reutilizan los hilos ya creados */
     t0 = omp_get_wtime();
     for (int r = 0; r < REPETICIONES; r++) {
         #pragma omp parallel

@@ -1,6 +1,6 @@
-﻿# III.3: frecuencia real del procesador mientras corre el programa con p hilos.
-# Windows reporta "% de rendimiento del procesador" respecto a la frecuencia
-# base (2100 MHz en el Ryzen 5 3450U); se promedian 7 muestras de 1 s.
+﻿# III.3: mide la velocidad real del procesador mientras corre el programa
+# con 1, 2, 4 y 8 hilos (promedio de 7 muestras de 1 segundo).
+# Windows la da como % de la velocidad base (2100 MHz).
 $contador = "\Información del procesador(_Total)\% de rendimiento del procesador"
 $base = (Get-CimInstance Win32_Processor).MaxClockSpeed
 $bin = (wsl -d Ubuntu --exec wslpath -a ($PSScriptRoot -replace "\\", "/")).Trim() + "/bin"

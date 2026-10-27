@@ -1,7 +1,6 @@
-/* montecarlo_secuencial.c -- version secuencial de referencia (la del enunciado)
-   con medicion de tiempo mediante omp_get_wtime().
-   Uso: ./montecarlo_secuencial <numero de muestras>
-   Compilar: gcc -O2 -fopenmp montecarlo_secuencial.c -o montecarlo_secuencial -lm */
+/* montecarlo_secuencial.c - Version de un solo hilo (la del enunciado)
+   que ademas mide el tiempo con omp_get_wtime().
+   Uso: ./montecarlo_secuencial <puntos> */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     long N = (argc > 1) ? atol(argv[1]) : 100000000L;
-    unsigned int estado = 2224510u; /* semilla asignada (codigo 2224510); el enunciado traia 20261018 */
+    unsigned int estado = 2224510u; /* mi codigo (el enunciado traia 20261018) */
     long dentro = 0;
 
     double t0 = omp_get_wtime();
