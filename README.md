@@ -10,7 +10,8 @@ del cuarto de círculo x² + y² ≤ 1. La proporción tiende a π/4, así que �
 
 ## Documentos
 
-- [`Documento_Final.pdf`](Documento_Final.pdf): las cuatro partes del examen, con figuras, capturas, bitácora de IA y el código.
+- [`montecarlo.c`](montecarlo.c): el programa paralelo final (también en `Parte_II/codigo/`).
+- [`Documento_Final.pdf`](Documento_Final.pdf): las cuatro partes del examen, con figuras, capturas y la bitácora de IA.
 - [`Parte_IV/Parte_IV_Informe.pdf`](Parte_IV/Parte_IV_Informe.pdf): el informe de la Parte IV con la bitácora de IA como anexo.
 
 ## Resultados principales
@@ -56,7 +57,7 @@ Parte_II/    Implementación: montecarlo.c (versión paralela final), versión s
              programas que cometen a propósito cada error (rand compartido, misma semilla,
              sin reduction, default(none))
 Parte_III/   Desempeño: tiempos con p = 1, 2, 4, 8, costo de los hilos, frecuencia del
-             procesador, static frente a dynamic y gráficas
+             procesador, static frente a dynamic, gráficas y salida completa de lscpu
 Parte_IV/    Informe del proceso en PDF
 ```
 
@@ -68,7 +69,7 @@ Cada parte tiene `codigo/` (programas y scripts), `resultados/` (salidas en text
 Requisitos: Linux o WSL, `gcc` con OpenMP y `bash`. Las gráficas usan Python 3 con `matplotlib`.
 
 ```bash
-gcc -O2 -fopenmp -Wall -Wextra Parte_II/codigo/montecarlo.c -o montecarlo -lm
+gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm      # compila sin advertencias
 
 ./montecarlo 100000000 4              # muestras, hilos y (opcional) semilla
 OMP_NUM_THREADS=8 ./montecarlo 100000000
