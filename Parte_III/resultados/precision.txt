@@ -1,0 +1,15 @@
+=== Mas hilos, mismo N = 10^8: cambia el tiempo, no el resultado ===
+p=1 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=1.3023 s
+p=2 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.6720 s
+p=4 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.3704 s
+p=8 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.2478 s
+
+=== Mismos hilos (p = 8), mas muestras: cambia la precision ===
+p=8 N=1000000 dentro=785389 pi=3.141556 |error|=3.67e-05 T=0.0094 s
+      error tipico esperado = 1.6e-03
+p=8 N=10000000 dentro=7856388 pi=3.142555 |error|=9.63e-04 T=0.0390 s
+      error tipico esperado = 5.2e-04
+p=8 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.2713 s
+      error tipico esperado = 1.6e-04
+p=8 N=400000000 dentro=314158355 pi=3.141584 |error|=9.10e-06 T=1.0985 s
+      error tipico esperado = 8.2e-05
