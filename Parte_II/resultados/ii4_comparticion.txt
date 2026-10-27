@@ -1,0 +1,18 @@
+=== default(none): el compilador nombra las variables que serian compartidas ===
+$ gcc -O2 -fopenmp pruebas/default_none.c -o default_none -lm
+default_none.c:63:13: error: ‘nbloques’ not specified in enclosing ‘parallel’
+default_none.c:63:13: note: enclosing ‘parallel’
+default_none.c:66:13: error: ‘semilla’ not specified in enclosing ‘parallel’
+default_none.c:63:13: note: enclosing ‘parallel’
+default_none.c:67:60: error: ‘N’ not specified in enclosing ‘parallel’
+default_none.c:63:13: note: enclosing ‘parallel’
+
+=== Sin reduction(+:dentro) ===
+sin_reduccion p=1 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=1.6947 s
+sin_reduccion p=8 N=100000000 dentro=16342251 pi=0.653690 |error|=2.49e+00 T=0.7596 s
+sin_reduccion p=8 N=100000000 dentro=17353899 pi=0.694156 |error|=2.45e+00 T=0.7805 s
+sin_reduccion p=8 N=100000000 dentro=16004117 pi=0.640165 |error|=2.50e+00 T=0.7626 s
+
+=== Con reduction(+:dentro) (version final) ===
+p=8 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.2494 s
+p=8 N=100000000 dentro=78541707 pi=3.141668 |error|=7.56e-05 T=0.2556 s
