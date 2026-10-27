@@ -1,0 +1,10 @@
+# Programas compilados (se generan con los scripts compilar.sh / parte1.sh)
+bin/
+
+# Enunciado, indicaciones y archivos fuente de los documentos: no van en el repositorio
+examen_openmp_montecarlo*.pdf
+Indicaciones_profesores.pdf
+*.docx
+Documento_Final.md
+Parte_*/*.md
+~$*
