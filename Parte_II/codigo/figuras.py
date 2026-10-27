@@ -50,7 +50,7 @@ for k, (h, ini, fin, est, _) in enumerate(estados):
     ax.add_patch(Rectangle((x0, 2.55), 2.35, 1.0, facecolor=colores[k], edgecolor="white", lw=2))
     ax.text(x0 + 1.17, 3.05, f"Hilo {h}\nbloques {k * 250}–{k * 250 + 249}", ha="center",
             va="center", color="white", fontsize=10, fontweight="bold")
-    ax.text(x0 + 0.05, 2.25, f"empieza en la\nmuestra {int(ini):,}".replace(",", " "), ha="left",
+    ax.text(x0 + 0.05, 2.25, f"empieza en la\nmuestra {int(ini):,}".replace(",", "."), ha="left",
             va="top", color=TENUE, fontsize=8.8)
 caja(ax, 0.6, 0.15, 8.8, 1.05,
      "La función saltar lleva a cada bloque directo a su lugar de la lista.\n"
