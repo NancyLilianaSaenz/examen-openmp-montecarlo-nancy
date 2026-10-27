@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     long N = (argc > 1) ? atol(argv[1]) : 100000000L;
-    unsigned int estado = 2224510u; /* semilla = mi codigo */
+    unsigned int estado = 2224510u; /* aqui cambie la semilla por mi codigo */
     long dentro = 0;
 
     double t0 = omp_get_wtime();
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
         if (x * x + y * y <= 1.0)   /* cayo dentro del circulo? */
             dentro++;   /* sumar un acierto */
     }
-    double t = omp_get_wtime() - t0;                    /* este tiempo es T(1) */
+    double t = omp_get_wtime() - t0;                    /* aqui paro el cronometro: este tiempo es T(1) */
 
     double pi = 4.0 * dentro / (double)N;               /* pi = 4 x aciertos / puntos */
     printf("secuencial N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",

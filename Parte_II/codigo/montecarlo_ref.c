@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
     long N = (argc > 1) ? atol(argv[1]) : 100000000L;
-    unsigned int estado = 2224510u; /* semilla = mi codigo */
+    unsigned int estado = 2224510u; /* aqui cambie la semilla por mi codigo */
     long dentro = 0;
 
     for (long i = 0; i < N; i++) {
