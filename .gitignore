@@ -8,3 +8,9 @@ Indicaciones_profesores.pdf
 Documento_Final.md
 Parte_*/*.md
 ~$*
+
+# Archivos auxiliares de LaTeX
+*.aux
+*.log
+*.out
+*.toc
