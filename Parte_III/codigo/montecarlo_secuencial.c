@@ -4,18 +4,18 @@
 #include <stdio.h>    /* printf */
 #include <stdlib.h>   /* rand_r, atol */
 #include <math.h>     /* fabs, M_PI */
-#include <omp.h>      /* solo para omp_get_wtime (el reloj) */
+#include <omp.h>      /* omp_get_wtime */
 
 int main(int argc, char *argv[]) {
-    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 si no se indica) */
-    unsigned int estado = 2224510u; /* mi codigo (el enunciado traia 20261018) */
+    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 por defecto) */
+    unsigned int estado = 2224510u; /* semilla = mi codigo */
     long dentro = 0;                                    /* aciertos */
 
     double t0 = omp_get_wtime();                        /* reloj al empezar */
-    for (long i = 0; i < N; i++) {                      /* un solo hilo hace todos los puntos */
-        double x = rand_r(&estado) / (double)RAND_MAX;  /* numero al azar entre 0 y 1 */
+    for (long i = 0; i < N; i++) {                      /* un solo hilo */
+        double x = rand_r(&estado) / (double)RAND_MAX;  /* azar entre 0 y 1 */
         double y = rand_r(&estado) / (double)RAND_MAX;
-        if (x * x + y * y <= 1.0)                       /* cayo dentro del circulo */
+        if (x * x + y * y <= 1.0)                       /* dentro del circulo */
             dentro++;
     }
     double t = omp_get_wtime() - t0;                    /* este tiempo es T(1) */

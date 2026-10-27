@@ -6,24 +6,24 @@
 #include <math.h>     /* fabs, M_PI */
 #include <omp.h>      /* OpenMP */
 
-#define SEMILLA_BASE 2224510u /* mi codigo de estudiante */
+#define SEMILLA_BASE 2224510u /* semilla = mi codigo */
 #define BLOQUE 100000L         /* puntos por paquete */
 
 #ifndef PLAN
-#define PLAN static            /* reparto de paquetes (o dynamic) */
+#define PLAN static            /* reparto en partes iguales */
 #endif
 
-/* rand_r usa la formula s = 1103515245*s + 12345.
-   Cada llamada da 3 pasos de la formula y cada punto
-   (x, y) hace 2 llamadas: 6 pasos por punto. */
+/* Formula de rand_r:
+   s = 1103515245*s + 12345
+   Cada punto usa 6 pasos. */
 #define LCG_A 1103515245u
 #define LCG_C 12345u
 #define PASOS_POR_MUESTRA 6ULL
 
-/* Da el estado del generador tras avanzar k pasos, sin hacerlos uno por uno. */
+/* Salta k pasos en la lista de numeros de una vez */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
-    unsigned int a = LCG_A, c = LCG_C;  /* formula para 1, 2, 4, 8... pasos */
-    unsigned int A = 1u, C = 0u;        /* formula acumulada */
+    unsigned int a = LCG_A, c = LCG_C;  /* salto de 1, 2, 4, 8... pasos */
+    unsigned int A = 1u, C = 0u;        /* salto acumulado */
     while (k) {
         if (k & 1ULL) {
             A = a * A;
@@ -37,12 +37,12 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {
 }
 
 int main(int argc, char *argv[]) {
-    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 si no se indica) */
-    if (argc > 2) omp_set_num_threads(atoi(argv[2]));   /* cuantos hilos usar */
+    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* puntos (10^8 por defecto) */
+    if (argc > 2) omp_set_num_threads(atoi(argv[2]));   /* hilos */
     unsigned int semilla = (argc > 3) ? (unsigned int)strtoul(argv[3], NULL, 10)
                                       : SEMILLA_BASE;
 
-    /* Revision: saltar debe dar lo mismo que rand_r */
+    /* Comprobar que saltar = rand_r */
     unsigned int prueba = semilla;
     rand_r(&prueba);
     rand_r(&prueba);
@@ -50,13 +50,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "error: rand_r de esta libc no usa el LCG esperado\n");
         return 1;
     }
-    /* Aviso: con demasiados puntos la lista de numeros se
-       repetiria y los paquetes usarian numeros iguales. */
+    /* Aviso: con demasiados puntos
+       la lista de numeros se repite. */
     if ((unsigned long long)N * PASOS_POR_MUESTRA > 4294967296ULL)
         fprintf(stderr, "aviso: N supera el periodo del generador\n");
 
     long nbloques = (N + BLOQUE - 1) / BLOQUE;
-    long dentro = 0;   /* aciertos: aqui queda COMPARTIDA entre todos los hilos */
+    long dentro = 0;   /* aciertos: COMPARTIDA */
 
     double t0 = omp_get_wtime();   /* reloj al empezar */
     #pragma omp parallel for schedule(PLAN)   /* ERROR: falta reduction(+:dentro) */
@@ -68,10 +68,10 @@ int main(int argc, char *argv[]) {
             double x = rand_r(&estado) / (double)RAND_MAX;
             double y = rand_r(&estado) / (double)RAND_MAX;
             if (x * x + y * y <= 1.0)
-                dentro++;   /* leer, sumar y guardar: dos hilos a la vez pierden aciertos */
+                dentro++;   /* aqui se pierden aciertos */
         }
     }
-    double t = omp_get_wtime() - t0;   /* tiempo del calculo */
+    double t = omp_get_wtime() - t0;   /* tiempo */
 
     double pi = 4.0 * dentro / (double)N;   /* pi = 4 x aciertos / puntos */
     printf("sin_reduccion p=%d N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",

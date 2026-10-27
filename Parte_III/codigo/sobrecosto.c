@@ -4,12 +4,12 @@
 #include <stdlib.h>   /* rand_r, rand, atol */
 #include <omp.h>      /* OpenMP */
 
-#define REPETICIONES 20000   /* se repite muchas veces y se promedia */
+#define REPETICIONES 20000   /* veces que se repite */
 
 int main(int argc, char *argv[]) {
     int p = (argc > 1) ? atoi(argv[1]) : 4;
     omp_set_num_threads(p);
-    volatile long basura = 0;   /* evita que el compilador borre las regiones vacias */
+    volatile long basura = 0;   /* evita que se borren las regiones */
 
     /* La primera region crea los hilos */
     double t0 = omp_get_wtime();   /* reloj al empezar */
@@ -17,13 +17,13 @@ int main(int argc, char *argv[]) {
     { if (omp_get_thread_num() < 0) basura++; }
     double creacion = omp_get_wtime() - t0;   /* costo de crear los hilos */
 
-    /* Las siguientes reutilizan los hilos ya creados */
+    /* Las demas reutilizan los hilos */
     t0 = omp_get_wtime();
     for (int r = 0; r < REPETICIONES; r++) {
         #pragma omp parallel
         { if (omp_get_thread_num() < 0) basura++; }
     }
-    double region = (omp_get_wtime() - t0) / REPETICIONES;   /* costo de abrir y cerrar una region */
+    double region = (omp_get_wtime() - t0) / REPETICIONES;   /* costo de una region */
 
     t0 = omp_get_wtime();
     for (int r = 0; r < REPETICIONES; r++) {
