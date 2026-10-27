@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
     long dentro = 0;
 
     for (long i = 0; i < N; i++) {
-        double x = rand_r(&estado) / (double)RAND_MAX;
-        double y = rand_r(&estado) / (double)RAND_MAX;
-        if (x * x + y * y <= 1.0)
-            dentro++;
+        double x = rand_r(&estado) / (double)RAND_MAX;   /* dardo: posicion x al azar (0 a 1) */
+        double y = rand_r(&estado) / (double)RAND_MAX;   /* posicion y al azar (0 a 1) */
+        if (x * x + y * y <= 1.0)   /* cayo dentro del circulo? */
+            dentro++;   /* sumar un acierto */
     }
 
     printf("Estimacion de pi: %.6f\n", 4.0 * dentro / (double)N);   /* pi = 4 x aciertos / puntos */
