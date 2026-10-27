@@ -14,3 +14,6 @@ Parte_*/*.md
 *.log
 *.out
 *.toc
+
+# Fuente LaTeX: se guarda aparte, no va en el repositorio
+*.tex
