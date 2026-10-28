@@ -8,11 +8,11 @@ Evaluación de Introducción a la computación paralela, Universidad Industrial 
 La idea: se lanzan N puntos al azar en el cuadrado [0, 1] × [0, 1] y se cuentan los que caen dentro
 del cuarto de círculo x² + y² ≤ 1. La proporción tiende a π/4, así que π ≈ 4 · dentro / N.
 
-## Documentos
+## Archivos
 
-- [`montecarlo.c`](montecarlo.c): el programa paralelo final (también en `Parte_II/codigo/`).
-- [`Documento_Final.pdf`](Documento_Final.pdf): las cuatro partes del examen, con figuras, capturas y la bitácora de IA.
-- [`Parte_IV/Parte_IV_Informe.pdf`](Parte_IV/Parte_IV_Informe.pdf): el informe de la Parte IV con la bitácora de IA como anexo.
+- [`montecarlo.c`](montecarlo.c): el programa paralelo final, con comentarios que explican cada parte.
+- [`Documento_Final.pdf`](Documento_Final.pdf): las cuatro partes del examen, con las figuras, las capturas de las ejecuciones, la tabla de tiempos, la salida de `lscpu` y la bitácora de IA.
+- [`Informe_Parte_IV.pdf`](Informe_Parte_IV.pdf): el informe de la Parte IV con la bitácora de IA como anexo.
 - [`PRESENTACION - Tipo tesis como el profesor lo dijo y 3 minutos.pdf`](PRESENTACION%20-%20Tipo%20tesis%20como%20el%20profesor%20lo%20dijo%20y%203%20minutos.pdf): la diapositiva de la presentación, con la metodología Tesis en 3 Minutos.
 
 ## Resultados principales
@@ -30,44 +30,29 @@ Mediana de 7 ejecuciones en un AMD Ryzen 5 3450U (4 núcleos, 8 hilos), Ubuntu e
 | 4 | 0,3700 | 3,392 | 0,848 |
 | 8 | 0,2499 | 5,022 | 0,628 |
 
-![Speedup medido frente al ideal y a la ley de Amdahl](Parte_III/evidencias/speedup.png)
+La gráfica de speedup frente al ideal y las demás evidencias están en `Documento_Final.pdf`.
 
 ## Cómo se paralelizó
 
-El ciclo del programa secuencial se conserva. Las N muestras se dividen en 1.000 bloques de 100.000
+El ciclo del programa del profesor se conserva. Las N muestras se dividen en 1.000 bloques de 100.000
 y OpenMP reparte los bloques entre los hilos:
 
 ```c
 #pragma omp parallel for reduction(+:dentro) schedule(static)
 for (long b = 0; b < nbloques; b++) {
     unsigned int estado = saltar(semilla, b * BLOQUE * 6);
-    /* el mismo ciclo del programa secuencial, sobre las muestras del bloque b */
+    /* el mismo ciclo del programa del profesor, sobre las muestras del bloque b */
 }
 ```
 
 - `reduction(+:dentro)`: cada hilo cuenta en una copia propia y al final se suman.
-- `saltar`: calcula en O(log k) pasos el estado que tendría `rand_r` después de k pasos, así que cada
+- `saltar`: calcula en pocos pasos el estado que tendría `rand_r` después de k pasos, así que cada
   bloque empieza justo donde estaría el programa secuencial. Los flujos no se solapan y el resultado
   es el mismo con cualquier número de hilos.
 
-## Estructura
-
-```
-Parte_I/     Fundamento del método: experimentos de error frente a N y de reparto en tramos
-Parte_II/    Implementación: montecarlo.c (versión paralela final), versión secuencial y
-             programas que cometen a propósito cada error (rand compartido, misma semilla,
-             sin reduction, default(none))
-Parte_III/   Desempeño: tiempos con p = 1, 2, 4, 8, costo de los hilos, frecuencia del
-             procesador, static frente a dynamic, gráficas y salida completa de lscpu
-Parte_IV/    Informe del proceso en PDF
-```
-
-Cada parte tiene `codigo/` (programas y scripts), `resultados/` (salidas en texto),
-`evidencias/` (capturas de la terminal durante las ejecuciones) y, cuando aplica, `figuras/`.
-
 ## Cómo ejecutarlo
 
-Requisitos: Linux o WSL, `gcc` con OpenMP y `bash`. Las gráficas usan Python 3 con `matplotlib`.
+Requisitos: Linux o WSL y `gcc` con OpenMP.
 
 ```bash
 gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm      # compila sin advertencias
@@ -75,10 +60,5 @@ gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm      # compila sin advertencias
 ./montecarlo 100000000 4              # muestras, hilos y (opcional) semilla
 OMP_NUM_THREADS=8 ./montecarlo 100000000
 ```
-
-Para repetir las pruebas y mediciones: `bash Parte_I/codigo/parte1.sh`,
-`bash Parte_II/codigo/compilar.sh` y luego `ii1_secuencial.sh` a `ii4_comparticion.sh`,
-`bash Parte_III/codigo/compilar.sh` y luego `tiempos.sh`, `sobrecosto.sh`, `precision.sh`
-y `planificacion.sh`.
 
 El uso de herramientas de inteligencia artificial generativa está declarado en la bitácora de IA del informe.

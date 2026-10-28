@@ -1,7 +1,0 @@
-tramo 0 (muestras         0 a  24999999):  19636256 aciertos
-tramo 1 (muestras  25000000 a  49999999):  19634338 aciertos
-tramo 2 (muestras  50000000 a  74999999):  19636316 aciertos
-tramo 3 (muestras  75000000 a  99999999):  19634797 aciertos
-suma de los 4 tramos       = 78541707   -> pi = 3.141668
-todas de corrido (secuencial) = 78541707   -> pi = 3.141668
-iguales: mismo estimador
