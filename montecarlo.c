@@ -6,8 +6,8 @@
 #include <math.h>
 #include <omp.h>
 
-#define SEMILLA_BASE 2224510u  /* mi codigo */
-#define BLOQUE 100000L         /* puntos por paquete */
+#define SEMILLA_BASE 2224510u  /* semilla: mi codigo de estudiante */
+#define BLOQUE 100000L         /* puntos por paquete (1.000 paquetes en total) */
 
 #ifndef PLAN
 #define PLAN static
@@ -17,7 +17,7 @@
 #define LCG_C 12345u
 #define PASOS_POR_MUESTRA 6ULL
 
-/* PARTE II: cada paquete salta a su lugar en la lista de numeros al azar */
+/* PARTE II: hace que cada paquete use numeros al azar distintos */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
     unsigned int a = LCG_A, c = LCG_C;
     unsigned int A = 1u, C = 0u;
@@ -52,16 +52,16 @@ int main(int argc, char *argv[]) {
     long nbloques = (N + BLOQUE - 1) / BLOQUE;
     long dentro = 0;
 
-    double t0 = omp_get_wtime();                 /* PARTE III: cronometro */
+    double t0 = omp_get_wtime();                 /* PARTE III: empieza a medir el tiempo */
 
-    /* PARTE II: reparte los paquetes entre los hilos; reduction suma lo de cada uno */
+    /* PARTE II: reparte el trabajo entre los hilos; reduction suma lo que conto cada uno */
     #pragma omp parallel for reduction(+:dentro) schedule(PLAN)
     for (long b = 0; b < nbloques; b++) {
         unsigned int estado =
             saltar(semilla, (unsigned long long)b * BLOQUE * PASOS_POR_MUESTRA);
         long fin = (b + 1) * BLOQUE < N ? (b + 1) * BLOQUE : N;
 
-        /* CODIGO DEL PROFESOR (Parte I): punto al azar; si cae dentro, se cuenta */
+        /* CODIGO DEL PROFESOR (Parte I): lanza un punto al azar y cuenta si cae dentro del circulo */
         for (long i = b * BLOQUE; i < fin; i++) {
             double x = rand_r(&estado) / (double)RAND_MAX;
             double y = rand_r(&estado) / (double)RAND_MAX;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    double t = omp_get_wtime() - t0;             /* PARTE III: tiempo */
+    double t = omp_get_wtime() - t0;             /* PARTE III: tiempo que tardo */
 
     double pi = 4.0 * dentro / (double)N;        /* PARTE I: pi = 4 x dentro / total */
     printf("p=%d N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",
