@@ -1,31 +1,33 @@
-/* montecarlo.c - Mi version con hilos (OpenMP) del programa del profesor.
+/* montecarlo.c - Calcula pi con el metodo de Monte Carlo usando varios hilos (OpenMP).
+   Nancy Liliana Saenz Moreno - codigo 2224510
    Uso: ./montecarlo <puntos> [hilos] [semilla]
    Compilar: gcc -O2 -fopenmp montecarlo.c -o montecarlo -lm */
 #include <stdio.h>
-#include <stdlib.h>   /* rand_r: numeros al azar */
+#include <stdlib.h>
 #include <math.h>
-#include <omp.h>   /* OpenMP: para usar varios hilos */
+#include <omp.h>
 
-#define SEMILLA_BASE 2224510u /* aqui puse mi codigo como semilla */
-#define BLOQUE 100000L   /* aqui dividi los dardos en paquetes: 10^8 = 1.000 */
+/* ===== PARTE II: datos para repartir el trabajo entre hilos ===== */
+#define SEMILLA_BASE 2224510u  /* semilla = mi codigo de estudiante */
+#define BLOQUE 100000L         /* puntos por paquete: 10^8 puntos = 1.000 paquetes */
 
 #ifndef PLAN
-#define PLAN static            /* aqui elegi repartir en partes iguales */
+#define PLAN static            /* los paquetes se reparten en partes iguales */
 #endif
 
-/* Formula de rand_r:
-   s = 1103515245*s + 12345
-   Cada punto usa 6 pasos. */
+/* rand_r usa la formula s = 1103515245*s + 12345; cada punto gasta 6 pasos. */
 #define LCG_A 1103515245u
 #define LCG_C 12345u
 #define PASOS_POR_MUESTRA 6ULL
 
-/* Aqui hice la funcion saltar: avanza k pasos en la lista de
-   numeros de una vez, asi cada paquete empieza en su lugar. */
+/* ===== PARTE II: funcion saltar =====
+   Da el estado del generador despues de k pasos, sin hacerlos uno por uno.
+   Asi cada paquete empieza en su propio lugar de la lista de numeros al azar
+   y ningun hilo repite los numeros de otro. */
 static unsigned int saltar(unsigned int s, unsigned long long k) {
     unsigned int a = LCG_A, c = LCG_C;
     unsigned int A = 1u, C = 0u;
-    while (k) {   /* recorre k en binario: pocas vueltas */
+    while (k) {
         if (k & 1ULL) {
             A = a * A;
             C = a * C + c;
@@ -34,17 +36,17 @@ static unsigned int saltar(unsigned int s, unsigned long long k) {
         a = a * a;
         k >>= 1;
     }
-    return A * s + C;   /* estado ya avanzado k pasos */
+    return A * s + C;
 }
 
 int main(int argc, char *argv[]) {
-    /* Aqui leo los datos: dardos, hilos y semilla */
-    long N = (argc > 1) ? atol(argv[1]) : 100000000L;   /* dardos a lanzar (100 millones) */
-    if (argc > 2) omp_set_num_threads(atoi(argv[2]));          /* aqui se eligen los hilos (o con OMP_NUM_THREADS) */
+    /* Datos: cuantos puntos, cuantos hilos y que semilla */
+    long N = (argc > 1) ? atol(argv[1]) : 100000000L;
+    if (argc > 2) omp_set_num_threads(atoi(argv[2]));
     unsigned int semilla = (argc > 3) ? (unsigned int)strtoul(argv[3], NULL, 10)
-                                      : SEMILLA_BASE;   /* si no se da, usa mi codigo */
+                                      : SEMILLA_BASE;
 
-    /* Aqui compruebo que saltar da lo mismo que rand_r */
+    /* Revision: saltar debe dar lo mismo que rand_r */
     unsigned int prueba = semilla;
     rand_r(&prueba);
     rand_r(&prueba);
@@ -52,34 +54,41 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "error: rand_r de esta libc no usa el LCG esperado\n");
         return 1;
     }
-    /* Aviso: con demasiados puntos
-       la lista de numeros se repite. */
     if ((unsigned long long)N * PASOS_POR_MUESTRA > 4294967296ULL)
         fprintf(stderr, "aviso: N supera el periodo del generador\n");
 
-    long nbloques = (N + BLOQUE - 1) / BLOQUE;   /* cuantos paquetes hay */
-    long dentro = 0;   /* aqui se cuentan los dardos que caen dentro */
+    long nbloques = (N + BLOQUE - 1) / BLOQUE;
+    long dentro = 0;                             /* puntos que caen dentro del circulo */
 
-    double t0 = omp_get_wtime();   /* aqui arranca el cronometro */
-    /* AQUI AGREGUE OPENMP: reparte los paquetes entre los hilos;
-       cada uno cuenta en su copia y al final se suman (reduction). */
+    /* ===== PARTE III: medir el tiempo (inicio del cronometro) ===== */
+    double t0 = omp_get_wtime();
+
+    /* ===== PARTE II: lo que agregue con OpenMP =====
+       parallel for -> reparte los paquetes entre los hilos
+       reduction    -> cada hilo cuenta en su propia copia de "dentro"
+                       y al final se suman, para que no se pisen */
     #pragma omp parallel for reduction(+:dentro) schedule(PLAN)
-    for (long b = 0; b < nbloques; b++) {        /* b: privada */
-        /* Aqui cada paquete salta a su lugar de la lista */
-        unsigned int estado =                    /* privada */
+    for (long b = 0; b < nbloques; b++) {
+        unsigned int estado =
             saltar(semilla, (unsigned long long)b * BLOQUE * PASOS_POR_MUESTRA);
-        long fin = (b + 1) * BLOQUE < N ? (b + 1) * BLOQUE : N;   /* ultimo dardo de este paquete */
-        for (long i = b * BLOQUE; i < fin; i++) {                 /* aqui va el mismo ciclo del profesor */
-            double x = rand_r(&estado) / (double)RAND_MAX;   /* dardo: posicion x al azar (0 a 1) */
-            double y = rand_r(&estado) / (double)RAND_MAX;   /* posicion y al azar (0 a 1) */
-            if (x * x + y * y <= 1.0)   /* cayo dentro del circulo? */
-                dentro++;               /* en la copia del hilo */
+        long fin = (b + 1) * BLOQUE < N ? (b + 1) * BLOQUE : N;
+
+        /* ===== CODIGO DEL PROFESOR (Parte I: el metodo de Monte Carlo) =====
+           un punto (x, y) al azar entre 0 y 1; si cae dentro del circulo, se cuenta */
+        for (long i = b * BLOQUE; i < fin; i++) {
+            double x = rand_r(&estado) / (double)RAND_MAX;
+            double y = rand_r(&estado) / (double)RAND_MAX;
+            if (x * x + y * y <= 1.0)
+                dentro++;
         }
     }
-    double t = omp_get_wtime() - t0;   /* aqui paro el cronometro: tiempo que tardo */
 
-    double pi = 4.0 * dentro / (double)N;        /* aqui calculo pi = 4 x dentro / total */
-    printf("p=%d N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",   /* aqui muestro el resultado */
+    /* ===== PARTE III: medir el tiempo (fin del cronometro) ===== */
+    double t = omp_get_wtime() - t0;
+
+    /* ===== PARTE I: resultado, pi = 4 x dentro / total ===== */
+    double pi = 4.0 * dentro / (double)N;
+    printf("p=%d N=%ld dentro=%ld pi=%.6f |error|=%.2e T=%.4f s\n",
            omp_get_max_threads(), N, dentro, pi, fabs(pi - M_PI), t);
     return 0;
 }
